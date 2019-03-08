@@ -1,0 +1,12 @@
+<div id="v-tpl" n="2" type="volume">
+    <bibl n="vol">
+        <title type="main">
+            <title lang="eng"></title>
+        </title>
+        <num lang="eng" type="volume"></num>
+        <extent class="text">
+            <num n="start" value=""></num>
+            <num n="end" value=""></num>
+        </extent>
+    </bibl>
+</div>

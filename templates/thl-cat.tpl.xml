@@ -1,0 +1,17 @@
+<div id="c-tpl" n="1" rend="expanded" type="collection">
+    <bibl n="dox">
+        <title type="main">
+            <title lang="tib">དཀར་ཆག</title>
+            <title lang="tib" rend="wyl">dkar chag</title>
+            <title lang="eng">Catalog</title>
+        </title>
+        <extent class="volumes">
+            <num n="start"></num>
+            <num n="end"></num>
+        </extent>
+        <extent class="texts">
+            <num n="start" type="id"></num>
+            <num n="end" type="id"></num>
+        </extent>
+    </bibl>
+</div>

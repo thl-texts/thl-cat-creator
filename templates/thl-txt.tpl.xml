@@ -1,0 +1,19 @@
+<div id="t-tpl" n="3" type="text">
+    <bibl n="text">
+        <title type="main">
+            <title lang="tib"></title>
+            <title lang="tib" rend="wyl"></title>
+            <title lang="eng"></title>
+        </title>
+        <idno type="vol"></idno>
+        <idno type="text"></idno>
+    </bibl>
+    <ab type="pagination">
+        <rs type="pagination" n="start">
+            <num type="page"></num>
+        </rs>
+        <rs type="pagination" n="end">
+            <num type="page"></num>
+        </rs>
+    </ab>
+</div>
