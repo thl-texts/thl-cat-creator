@@ -75,7 +75,7 @@ class ThlCatCreator(ThlBase):
         print("\n\n")
         for errnm, tlist in errs.items():
             if isinstance(tlist, list) and len(tlist) > 0:
-                print("{}: {}".format(errnm, ', '.join(tlist)))
+                print("{} texts with {}: \n{}\n\n".format(len(tlist), errnm, ', '.join(tlist)))
 
 
 if __name__ == '__main__':
