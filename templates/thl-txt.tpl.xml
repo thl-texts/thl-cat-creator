@@ -11,9 +11,11 @@
     <ab type="pagination">
         <rs type="pagination" n="start">
             <num type="page"></num>
+            <num type="line"></num>
         </rs>
         <rs type="pagination" n="end">
             <num type="page"></num>
+            <num type="line"></num>
         </rs>
     </ab>
 </div>

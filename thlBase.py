@@ -73,3 +73,6 @@ class ThlBase:
             return ttree.getroot()
         else:
             return ttree
+
+if __name__ == '__main__':
+    print("in main")
