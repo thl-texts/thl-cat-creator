@@ -22,6 +22,7 @@ class ThlText(ThlBase):
         self.stpg = stpg
         self.enpg = enpg
         self.doxcat = doxcat
+        self.errors = []
         self.setxml()
         self.finalize()
 
@@ -44,10 +45,16 @@ class ThlText(ThlBase):
         self.settxt('/div/bibl/idno[@type="text"]', self.tnum.zfill(4))
         pts = self.stpg.split('.')
         self.settxt('//rs[@type="pagination" and @n="start"]/num[@type="page"]', pts[0])
-        self.settxt('//rs[@type="pagination" and @n="start"]/num[@type="line"]', pts[1])
+        if len(pts) > 1:
+            self.settxt('//rs[@type="pagination" and @n="start"]/num[@type="line"]', pts[1])
+        else:
+            self.errors.append("No start page")
         pts = self.enpg.split('.')
         self.settxt('//rs[@type="pagination" and @n="end"]/num[@type="page"]', pts[0])
-        self.settxt('//rs[@type="pagination" and @n="end"]/num[@type="line"]', pts[1])
+        if len(pts) > 1:
+            self.settxt('//rs[@type="pagination" and @n="end"]/num[@type="line"]', pts[1])
+        else:
+            self.errors.append("No end page")
 
 
 if __name__ == "__main__":

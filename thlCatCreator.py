@@ -57,9 +57,32 @@ class ThlCatCreator(ThlBase):
         with open(outfile, 'w') as outf:
             outf.write(self.printme())
 
+    def write_volsum(self, outfile):
+        with open(outfile, 'w') as outf:
+            for vol in self.vols:
+                row = '"{}","{}","{}","{}","{}"'.format(vol.vnum, vol.title, len(vol.texts), vol.texts[0].tnum, vol.texts[-1].tnum) + "\n"
+                outf.write(row)
+
+    def get_errors(self):
+        errs = {}
+        for txt in self.texts:
+            for err in txt.errors:
+                if err not in errs:
+                    errs[err] = [txt.tnum]
+                else:
+                    errs[err].append(txt.tnum)
+
+        print("\n\n")
+        for errnm, tlist in errs.items():
+            if isinstance(tlist, list) and len(tlist) > 0:
+                print("{}: {}".errnm, ', '.join(tlist))
+
+
 if __name__ == '__main__':
     mycat = ThlCatCreator('../../testdoc.csv', 'km', 't')
     mycat.build_cat()
     mycat.write_cat('../../km-t-cat.xml')
+    mycat.write_volsum('../../km-t-volsum-test.csv')
+    mycat.get_errors()
     print("\n{} texts and {} vols".format(len(mycat.texts), len(mycat.vols)))
 

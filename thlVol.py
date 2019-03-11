@@ -11,6 +11,7 @@ class ThlVol(ThlBase):
         self.catsig = catsig
         self.edsig = edsig
         self.type = 'vol'
+        self.title = ''
         self.vnum = vnum
         self.vlet = vlet
         self.vlet2 = vlet2
@@ -25,6 +26,7 @@ class ThlVol(ThlBase):
             title = "Volume {}".format(self.vnum)
         tel = self.findel('/div/bibl/title[@type="main"]/title[1]')
         tel.text = title
+        self.title = title
 
     def setnum(self, num=None):
         if num is None:
