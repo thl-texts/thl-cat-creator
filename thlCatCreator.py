@@ -4,6 +4,7 @@ from thlBase import ThlBase
 from csvDoc import CsvDoc
 from thlVol import ThlVol
 from thlText import ThlText
+from thlBibl import ThlBibl
 
 class ThlCatCreator(ThlBase):
 
@@ -86,12 +87,23 @@ class ThlCatCreator(ThlBase):
         print("\n{} texts and {} vols".format(len(self.texts), len(self.vols)))
 
     def write_vol_bibls(self, outdir):
+        if outdir[-1] != '/':
+            outdir += '/'
         for v in self.vols:
-            vxml = self.load_template('vol-bibl')
-
+            vbib = ThlBibl('vol-bibl', self.catsig, self.edsig, v.vnum)
+            vbib.set_resp('Naomi Worth', '2016-11-09')
+            vbib.set_tibid("Tse ring rgya mtsho", "tse ring rgya mtsho", "T", v.vnum, v.vlet)
+            vbib.writeme(outdir + vbib.filename)
+            exit(0)
 
 
 if __name__ == '__main__':
-    mycat = ThlCatCreator('../data/testcatdata.csv', 'km', 't')
+    mycat = ThlCatCreator('../data/smtestdata.csv', 'km', 't')
     # mycat.write_cat_files('../out/km-t-cat.xml', '../data/km-t-volsum-test.csv')
+    mycat.write_vol_bibls('../out/')
 
+    # myrow = ['51', u'Sometext name', '2', 'kha', 'a', '23', '456', '1', '456', 'somdoxcat']
+    # volme = ThlVol(myrow)
+    # tmpel = ThlBibl('vol-bibl')
+    # tibid = tmpel.findel('//tibiddecl/tibid')
+    # print(volme.xstr(tibid))

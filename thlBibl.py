@@ -1,66 +1,105 @@
 #! /usr/bin/env python
 
-import html
+import datetime
 
 from thlBase import ThlBase
 
-class ThlVol(ThlBase):
+class ThlBibl(ThlBase):
 
-    def __init__(self, row, catsig='km', edsig='t'):
-        tnum, title, vnum, vlet, vlet2, vseq, pgs, stpg, enpg, doxcat = row
+    def __init__(self, ttype, catsig='km', edsig='t', num=0, inits="ndg"):
+        self.id = ''
+        self.filename = ''
+        self.type = ttype
         self.catsig = catsig
         self.edsig = edsig
-        self.type = 'vol'
-        self.title = ''
-        self.vnum = vnum
-        self.vlet = vlet
-        self.vlet2 = vlet2
-        self.texts = []
-        self.doxcats = []
+        self.num = num
+        self.inits = inits
+        self.catname = ''
+        self.edname = ''
+        dt = datetime.datetime.now()
+        self.now = dt.strftime("%Y-%m-%d")
+        self.errors = []
         self.setxml()
-        self.settitle()
-        self.setnum()
+        if int(self.num) > 0:
+            self.set_ids()
 
-    def settitle(self, title=None):
-        if title is None:
-            title = "Volume {}".format(self.vnum)
-        tel = self.findel('/div/bibl/title[@type="main"]/title[1]')
-        tel.text = title
-        self.title = title
+    def getid(self):
+        return self.id
 
-    def setnum(self, num=None):
-        if num is None:
-            num = int(self.vnum)
-        vnel = self.findel('/div/bibl/num[@type="volume"]')
-        vnel.text = str(num)
+    def set_ids(self):
+        if self.num == 0:
+            print("Warning: In {} class creating ID string, no id number has be set. Will use 0.".format(self.type))
+        myid = "{}-{}".format(self.catsig, self.edsig)
+        if self.type == 'vol-bibl':
+            myid += "-v{}".format(str(self.num).zfill(3))
+        elif self.type == 'txt-bibl':
+            myid += "-{}".format(str(self.num).zfill(4))
+        self.id = myid
+        self.settxt('/tibbibl/controlinfo/sysid', self.id)
+        self.filename = myid + '-bib.xml'
+        self.root.set('id', self.filename)
 
-    def add_text(self, atext):
-        self.texts.append(atext)
-        if atext.doxcat:
-            self.doxcats.append(atext.doxcat)
+    def set_resp(self, cataloger, datecat):
+        self.settxt('/tibbibl/controlinfo/date', datecat)
+        self.settxt('/tibbibl/controlinfo/respStmt/resp', "Cataloger")
+        self.settxt('/tibbibl/controlinfo/respStmt/name', cataloger)
+        self.settxt('/tibbibl/controlinfo/revisionDesc/change/date', self.now)
+        self.settxt('/tibbibl/controlinfo/revisionDesc/change/respStmt/name', self.inits)
 
-    def get_current_text(self):
-        if len(self.texts) > 0:
-            return self.texts[-1]
+    def set_tibid(self, ednm, edwy, edsig, vnum, vlet):
+        tibid = self.findel('//tibiddecl/tibid')
+        if tibid is not None:
+            tibid.text = self.catsig
+            edtibid = tibid[0]
+            edtibid.text = ednm
 
-    # When all the texts are added fill in the information
+            # Add alt ed id
+            edalt = edtibid[0]
+            edtib = self.gettib(edwy)
+            comm = self.create_comment(edwy)
+            edalt.append(comm)
+            comm.tail = edtib
+
+            # Do vol info
+            edsigel = edtibid[1]
+            edsigel.text = edsig
+            voltibid = edsigel[0]
+            voltibid.text = str(vnum).zfill(2)
+            valtid = voltibid[0]
+            comm = self.create_comment(vlet)
+            valtid.append(comm)
+            comm.tail = vlet
+        else:
+            print("Can't find tibid in template")
+
+    def get_ed_tibid(self):
+        el = self.findel('//tibidecl//tibid[@type="edition" and @system="sigla"]')
+        return el
+
+    def get_filename(self):
+        fnm = self.id + '-bib.xml'
+
     def finalize(self):
-        self.root.set('id', "{}-{}-v{}".format(self.catsig, self.edsig, str(self.vnum).zfill(3)))
-        stnm = str(self.texts[0].tnum).zfill(4)
-        endnm = str(self.texts[-1].tnum).zfill(4)
-        self.settext('/div/bibl/extent[@class="texts"]', len(self.texts))
-        extent = self.findel('/div/bibl/extent[@class="text"]')
-        extent[0].set('value', stnm)
-        extent[0].text = stnm
-        extent[1].set('value', endnm)
-        extent[1].text = endnm
-
-        for txt in self.texts:
-            self.root.append(txt.root)
+        # use if needed to finalize before exporting to xml
+        pass
 
 
 if __name__ == "__main__":
-    myrow = ['T', '2', u'སྐྱབས་འགྲོ་ཡན་ལག་དྲུག་པ་སློབ་དཔོན་ཆེན་པོ་དྲི་མེད་བཤེས་གཉེན་གྱིས་མཛད་པ་ ', '3', 'a', '1', '1.1', '4.5', 'somdoxcat']
-    volme = ThlVol(myrow)
+    outfl = '../out/txt-bibl-text.xml'
+    me = ThlBibl('txt-bibl', 'km', 't', 3)
+    me.set_resp('kaw', '2017-05-12')
+    # me.writeme(outfl)
+    tibid = me.findel('//tibiddecl/tibid')
+    tibid.text = "hola"
+    edtib = tibid[0]
+    edtib.text = "halo"
+    edalt = edtib[0]
+    wyl = "gting skyes"
+    tib = me.gettib(wyl)
+    comm = me.create_comment(wyl)
+    edalt.append(comm)
+    comm.tail = tib
+    print(me.xstr(tibid))
+
 
 

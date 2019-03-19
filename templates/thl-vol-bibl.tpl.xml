@@ -23,9 +23,7 @@
 			<xref n="parent-cat"></xref>
 		</resources>
 	</controlinfo>
-	<!--Bibliographic Information for Volume 1 (ka) of Bai ro'i rgyud 'bum edition of The Collected Tantras of the Ancients-->
 	<tibiddecl scheme="thl">
-		<!--Identification Information-->
 		<tibid type="collection" system="sigla"><tibid type="edition" system="letter"><altid lang="tib"
 					system="letter"></altid>
 				<tibid type="edition" system="sigla"><tibid type="volume" system="number"><altid system="letter" lang="tib"

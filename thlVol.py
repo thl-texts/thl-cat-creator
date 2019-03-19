@@ -60,7 +60,10 @@ class ThlVol(ThlBase):
 
 
 if __name__ == "__main__":
-    myrow = ['T', '2', u'སྐྱབས་འགྲོ་ཡན་ལག་དྲུག་པ་སློབ་དཔོན་ཆེན་པོ་དྲི་མེད་བཤེས་གཉེན་གྱིས་མཛད་པ་ ', '3', 'a', '1', '1.1', '4.5', 'somdoxcat']
+    myrow = ['51', u'Sometext name', '2', 'kha', 'a', '23', '456', '1', '456', 'somdoxcat']
     volme = ThlVol(myrow)
+    tmpel = volme.load_template('vol-bibl', True)
+    tibid = tmpel.findel('//tibiddecl/tibid')
+    print(volme.xstr(tibid))
 
 
