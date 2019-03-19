@@ -4,6 +4,7 @@
             <title lang="eng"></title>
         </title>
         <num lang="eng" type="volume"></num>
+        <extent class="texts"></extent>
         <extent class="text">
             <num n="start" value=""></num>
             <num n="end" value=""></num>

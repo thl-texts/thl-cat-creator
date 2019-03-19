@@ -78,11 +78,20 @@ class ThlCatCreator(ThlBase):
                 print("{} texts with {}: \n{}\n\n".format(len(tlist), errnm, ', '.join(tlist)))
 
 
+    def write_cat_files(self, catoutnm, voloutnm):
+        self.build_cat()
+        self.write_cat(catoutnm)
+        self.write_volsum(voloutnm)
+        self.get_errors()
+        print("\n{} texts and {} vols".format(len(self.texts), len(self.vols)))
+
+    def write_vol_bibls(self, outdir):
+        for v in self.vols:
+            vxml = self.load_template('vol-bibl')
+
+
+
 if __name__ == '__main__':
-    mycat = ThlCatCreator('../../testdoc.csv', 'km', 't')
-    mycat.build_cat()
-    mycat.write_cat('../../km-t-cat.xml')
-    mycat.write_volsum('../../km-t-volsum-test.csv')
-    mycat.get_errors()
-    print("\n{} texts and {} vols".format(len(mycat.texts), len(mycat.vols)))
+    mycat = ThlCatCreator('../data/testcatdata.csv', 'km', 't')
+    # mycat.write_cat_files('../out/km-t-cat.xml', '../data/km-t-volsum-test.csv')
 
