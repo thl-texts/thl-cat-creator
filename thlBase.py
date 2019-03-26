@@ -1,5 +1,10 @@
 #! /usr/bin/env python
 
+"""
+The ThlBase class is the base class for all the Python classes in this package
+It provides basic XML functionality through LXML and catalog specific functions used by all types,
+such as "formatsig", "getwylie", "gettibetan", etc.
+"""
 from lxml import etree
 from html import unescape as htmlunesc
 from urllib import parse as urlparse
@@ -28,10 +33,14 @@ class ThlBase:
     def getid(self):
         pass
 
+    def getfilename(self):
+        pass
+
     def printme(self):
         return self.xstr(self.root)
 
     def settxt(self, xpath, txtval):
+        txtval = str(txtval)
         el = self.findel(xpath)
         if el is not None:
             el.text = txtval
@@ -57,9 +66,16 @@ class ThlBase:
     def create_element(nm, txt, atts={}):
         el = etree.Element(nm)
         el.text = txt
-        for n, v in atts.iteritems():
+        for n, v in atts.items():
             el.set(n, v)
         return el
+
+    @staticmethod
+    def formatsig(sig, style="id"):
+        if style == 'print' and len(sig) > 0:
+            return sig[0].upper() + sig[1:]
+        else:
+            return sig
 
     @staticmethod
     def getwylie(tibtxt):
@@ -74,7 +90,6 @@ class ThlBase:
     def gettib(wytxt):
         http = PoolManager()
         url = TIBCONVURL + wytxt.replace(' ', '%20')
-        print(url)
         req = http.request('GET', url)
         if req.status == 200:
             return req.data.decode('utf-8')
@@ -95,6 +110,22 @@ class ThlBase:
             return ttree.getroot()
         else:
             return ttree
+
+    @staticmethod
+    def page_split(pgln, is_end=False):
+        pgln = str(pgln)
+        pg = ""
+        ln = ""
+        if len(pgln) > 0:
+            pts = str(pgln).split(".")
+            pg = pts[0]
+            if len(pts) > 1:
+                ln = pts[1]
+            elif is_end:
+                ln = "?"
+            else:
+                ln = "1"
+        return pg, ln
 
     @staticmethod
     def xstr(xmlel):

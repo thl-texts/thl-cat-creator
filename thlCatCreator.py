@@ -1,5 +1,19 @@
 #! /usr/bin/env python
+"""
+The ThlCatCreator class is the main class of the package. It is the controller of all other classes.
+The __MAIN__ function here is the code that initiates and does the creation of all docs
+Calling on and using the other classes.
 
+This class itself holds the main universal information about the catalog, including who cataloged it and when, the edition
+name that is currently being created, the wylie name for the edition, etc.
+
+This routine/class does not create the catalog bibl file itself so information such as the catalog's fullname is not required.
+The catalog bibl file needs to be created by hand.
+
+This routine/class will create the catalog toc file, all the volbibls, and all the text bibls.
+
+It contains among other things a list of all its volumes and a list of all its texts
+"""
 from thlBase import ThlBase
 from csvDoc import CsvDoc
 from thlVol import ThlVol
@@ -8,21 +22,42 @@ from thlBibl import ThlBibl
 
 class ThlCatCreator(ThlBase):
 
-    def __init__(self, datapath, catsig, edsig):
+    def __init__(self, datapath, catsig, edsig, cataloger="", catdate="", edname="", edwyl=""):
+        # Cataloging Info
         self.type = 'cat'
-        self.datapath = datapath
         self.catsig = catsig
         self.edsig = edsig
+        self.cataloger = cataloger
+        self.catdate = catdate
+        self.edname = edname
+        self.edwyl = edwyl
+        self.edtib = self.gettib(edwyl) if edwyl != "" else ""
+
+        # Data Paths and Arrays
+        self.datapath = datapath
+        self.data = None
+        self.voldata = None
+        self.voloffset = None
+
+        # Lists of Content Items
         self.vols = []
         self.texts = []
-        self.data = None
+
         self.setxml()
         self.load_data()
         self.process_data()
 
-    def load_data(self):
-        # Load the CSV document with the catalog data
-        self.data = CsvDoc(self.datapath)
+    def getfilename(self):
+        return "{}-{}-cat.xml".format(self.catsig, self.edsig)
+
+    def load_data(self, datatype="cat", otherdatapath=None):
+        if datatype == "cat":
+            # Load the CSV document with the catalog data
+            self.data = CsvDoc(self.datapath)
+        elif datatype == "vol":
+            self.voldata = CsvDoc(otherdatapath)
+        elif datatype == "voloffset":
+            self.voloffset = CsvDoc(otherdatapath)
 
     def process_data(self):
         # Process the CSV file into arrays of texts and volumes which also have arrays of texts
@@ -58,13 +93,16 @@ class ThlCatCreator(ThlBase):
         with open(outfile, 'w') as outf:
             outf.write(self.printme())
 
+
     def write_volsum(self, outfile):
+        # Writes a summary of volume information gleaned from the catalog into a csv doc named outfile.csv
         with open(outfile, 'w') as outf:
             for vol in self.vols:
                 row = '"{}","{}","{}","{}","{}"'.format(vol.vnum, vol.title, len(vol.texts), vol.texts[0].tnum, vol.texts[-1].tnum) + "\n"
                 outf.write(row)
 
     def get_errors(self):
+        # Retrieved the errors from each text and prints them out together
         errs = {}
         for txt in self.texts:
             for err in txt.errors:
@@ -79,31 +117,63 @@ class ThlCatCreator(ThlBase):
                 print("{} texts with {}: \n{}\n\n".format(len(tlist), errnm, ', '.join(tlist)))
 
 
-    def write_cat_files(self, catoutnm, voloutnm):
-        self.build_cat()
-        self.write_cat(catoutnm)
-        self.write_volsum(voloutnm)
+    def write_cat_files(self, catoutdir, voldir, textdir, writecatfile=True):
+        # Write all catalog files: the catalog xml, the vol bibs, the text bibs, and prints out errors
+        """
+        :param catoutdir:
+        :param voldir:
+        :param textdir:
+        :param writecatfile:  A Boolean that determines whether to write vol and cat files.
+
+        :return:
+        """
+
+        if catoutdir[-1] != "/":
+            catoutdir += "/"
+        catoutnm = catoutdir + self.getfilename()
+        voldir = catoutdir + voldir + '/'
+        textdir = catoutdir + textdir + '/'
+        if writecatfile:
+            self.write_cat(catoutnm)
+            self.write_vol_bibls(voldir)
+        self.write_text_bibls(textdir)
         self.get_errors()
         print("\n{} texts and {} vols".format(len(self.texts), len(self.vols)))
 
     def write_vol_bibls(self, outdir):
-        if outdir[-1] != '/':
-            outdir += '/'
         for v in self.vols:
             vbib = ThlBibl('vol-bibl', self.catsig, self.edsig, v.vnum)
-            vbib.set_resp('Naomi Worth', '2016-11-09')
-            vbib.set_tibid("Tse ring rgya mtsho", "tse ring rgya mtsho", "T", v.vnum, v.vlet)
-            vbib.writeme(outdir + vbib.filename)
-            exit(0)
+            vbib.set_resp(self.cataloger, self.catdate)
+            vbib.set_tibid(self.edname, self.edwyl, self.formatsig(self.edsig, 'print'),
+                           v.vnum, v.vlet, v.vlet2)
+            vdr = self.voldata.findrow(0, str(v.vnum))
+            doxcat = str(vdr[5]) if vdr is not None else ""
+            vosr = self.voloffset.findrow(0, str(v.vnum))
+            presides = str(vosr[3]) if vosr is not None else ""
+            v.writebib(vbib, doxcat, presides, outdir)
+
+    def write_text_bibls(self, outdir):
+        for t in self.texts:
+            print("Writing text: {}".format(t.tnum))
+            tbib = ThlBibl('txt-bibl', self.catsig, self.edsig, t.tnum)
+            tbib.set_resp(self.cataloger, self.catdate)
+            tbib.set_tibid(self.edname, self.edwyl, self.formatsig(self.edsig, 'print'),
+                           t.vnum, t.vlet, t.vlet2, t.tnum, t.vseq)
+            t.writebib(tbib, outdir)
 
 
 if __name__ == '__main__':
-    mycat = ThlCatCreator('../data/smtestdata.csv', 'km', 't')
-    # mycat.write_cat_files('../out/km-t-cat.xml', '../data/km-t-volsum-test.csv')
-    mycat.write_vol_bibls('../out/')
+    # Create cat object by loading csv and assigning variables
+    datafile = '../data/km-t-data-naomi.csv'
+    write_the_cat = True
 
-    # myrow = ['51', u'Sometext name', '2', 'kha', 'a', '23', '456', '1', '456', 'somdoxcat']
-    # volme = ThlVol(myrow)
-    # tmpel = ThlBibl('vol-bibl')
-    # tibid = tmpel.findel('//tibiddecl/tibid')
-    # print(volme.xstr(tibid))
+    # Create the catalog objects
+    mycat = ThlCatCreator(datafile, 'km', 't',
+                          'Naomi Worth', '2017-03-22',
+                          "Tse ring rgya mtsho", "tse ring rgya mtsho")
+    # Load extra vol data
+    mycat.load_data('vol', '../data/km-vol-data-naomi.csv')
+    mycat.load_data('voloffset', '../data/km-vol-offset.csv')
+
+    # print out the files
+    mycat.write_cat_files('../out/', 'volbibs', 'textbibs', write_the_cat)

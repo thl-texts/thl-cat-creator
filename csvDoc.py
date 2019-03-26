@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 
+"""
+The CsvDoc class simplifies the loading and accessing of CSV files by providing some extra helper functions
+
+"""
 import os
 import csv
 
@@ -80,6 +84,14 @@ class CsvDoc:
         cell = self.getcell(r, c)
         label = self.heads[c - 1] if len(self.heads) >= c else ''
         return {'value': cell, 'label': label}
+
+    def findrow(self, colnum, val):
+        val = str(val).strip()
+        for rw in self.data:
+            coldata = str(rw[colnum]).strip()
+            if coldata == val:
+                return rw
+        return None
 
 if __name__ == '__main__':
     fnm = '../Nyingma Kama Digital Edition Catalog.csv'

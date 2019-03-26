@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 
+"""
+The ThlVol class is the controller for a single catalog volume. It contains many common properties as well as a list
+of texts contained in the volume
+"""
 import html
 
 from thlBase import ThlBase
@@ -17,9 +21,13 @@ class ThlVol(ThlBase):
         self.vlet2 = vlet2
         self.texts = []
         self.doxcats = []
+        self.tibbibl = None
         self.setxml()
         self.settitle()
         self.setnum()
+
+    def getfilename(self):
+        return "{}-{}-v{}-bib.xml".format(self.catsig, self.edsig, str(self.vnum).zfill(3))
 
     def settitle(self, title=None):
         if title is None:
@@ -57,6 +65,33 @@ class ThlVol(ThlBase):
 
         for txt in self.texts:
             self.root.append(txt.root)
+
+    def writebib(self, vbib, doxcat, presides, outdir):
+        vbib.settxt('//titledecl[@n="titlepage"]/title[@type="normalized"]',
+                    "Volume {} (<hi rend=\"tib\">{}</hi>)".format(self.vnum, self.vlet))
+        vbib.settxt('//divdecl[@type="texts"]/divcount[@class="total"]', len(self.texts))
+        vbib.settxt('//extentdecl[@type="text"]/extent[@class="first"]', self.texts[0].tnum)
+        vbib.settxt('//extentdecl[@type="text"]/extent[@class="last"]', self.texts[-1].tnum)
+        totalpgs = self.texts[-1].enpg
+        if "." not in totalpgs:
+            totalpgs += ".0"
+        vbib.settxt('//extentdecl[@type="sides"]/extent[@class="total"]', int(float(totalpgs)))
+        vbib.settxt('/tibbibl/physdecl/pagination/rs[@n="end"]/num', self.texts[-1].enpg)
+        vbib.settxt('//intelldecl/doxography[@type="category"]', doxcat)
+        vbib.settxt('//extentdecl[@type="sides"]/extent[@class="sides-before-1a"]', presides)
+
+        # Add dox cats from text margins
+        margdox = []
+        for t in self.texts:
+            if t.doxcat is not None and t.doxcat != '':
+                margdox.append(t.doxcat)
+        margdox = set(margdox)  # get unique values
+        intdecl = vbib.findel('//intelldecl')
+        for dox in margdox:
+            intdecl.append(
+                self.create_element('doxography', dox, {"type": "category", "lang": "tib", "subtype": "margin"}))
+
+        vbib.writeme(outdir + vbib.filename)
 
 
 if __name__ == "__main__":

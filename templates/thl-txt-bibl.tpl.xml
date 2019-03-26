@@ -23,15 +23,14 @@
          <xref n="parent-cat"></xref>
       </resources>
    </controlinfo>
-   <!--Bibliographic Record for བྱང་ཆུབ་ཀྱི་སེམས་ཀུན་བྱེད་རྒྱལ་པོ། ལྟ་བ་ནམ་མཁའ་ལྟར་མཐའ་དབུས་མེད་པའི་རྒྱུད། ནམ་མཁའི་སྙིང་པོ་མཆོག་གི་དོན་གསང་བ་མཆོག་གི་མདོ་ལུང་བརྒྱད་ཅུ་རྩ་བཞི་པ། -->
    <tibiddecl scheme="thl">
       <!--Identification Information-->
-      <tibid type="collection" system="sigla">ngb <tibid type="edition" system="letter">gTing skyes
-               <altid lang="tib" system="letter"><!--gting skyes-->གཏིང་སྐྱེས</altid>
-            <tibid type="edition" system="sigla">Tk<tibid type="text" system="number">0002</tibid>
-               <tibid type="volume" system="number">01<altid system="letter" lang="tib"
-                     ><!--ka-->ཀ</altid>
-                  <tibid type="text" system="number">2</tibid>
+      <tibid type="collection" system="sigla"> <tibid type="edition" system="letter">
+               <altid lang="tib" system="letter"></altid>
+            <tibid type="edition" system="sigla"><tibid type="text" system="number"></tibid>
+               <tibid type="volume" system="number"><altid system="letter" lang="tib"
+                     ></altid>
+                  <tibid type="text" system="number"></tibid>
                </tibid>
             </tibid>
          </tibid>
@@ -57,8 +56,8 @@
    <intelldecl>
       <!--Intellectual Description-->
       <doxography type="relation">Kama text proper</doxography>
-      <doxography type="category" lang="tib" subtype="edition"
-         ><!--a ti yo ga-->ཨ་ཏི་ཡོ་ག</doxography>
+      <doxography type="category" lang="tib" subtype="margin"
+         ></doxography>
    </intelldecl>
    <titlegrp>
       <titledecl n="text">

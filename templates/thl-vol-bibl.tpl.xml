@@ -46,7 +46,8 @@
 			<extent class="first"></extent>
 			<extent class="last"></extent>
 		</extentdecl>
-		<extentdecl type="folio-sides">
+		<extentdecl type="sides">
+			<extent class="sides-before-1a"></extent>
 			<extent class="total"></extent>
 		</extentdecl>
 		<pagination>
@@ -58,4 +59,7 @@
 			</rs>
 		</pagination>
 	</physdecl>
+	<intelldecl>
+		<doxography type="category" lang="tib" subtype="edition"></doxography>
+	</intelldecl>
 </tibbibl>
