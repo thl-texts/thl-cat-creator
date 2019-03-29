@@ -51,7 +51,7 @@
       <extentdecl type="sides">
          <extent class="total" />
       </extentdecl>
-      <physfacet lang="tib" type="script"><!--dbu can/-->དབུ་ཅན།</physfacet>
+      <physfacet lang="tib" type="script"><!--dbu can -->དབུ་ཅན་</physfacet>
    </physdecl>
    <intelldecl>
       <!--Intellectual Description-->

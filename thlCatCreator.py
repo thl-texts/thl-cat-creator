@@ -17,6 +17,7 @@ It contains among other things a list of all its volumes and a list of all its t
 from thlBase import ThlBase
 from csvDoc import CsvDoc
 from thlVol import ThlVol
+from thlDox import ThlDox
 from thlText import ThlText
 from thlBibl import ThlBibl
 
@@ -38,6 +39,7 @@ class ThlCatCreator(ThlBase):
         self.data = None
         self.voldata = None
         self.voloffset = None
+        self.doxtoc = None
 
         # Lists of Content Items
         self.vols = []
@@ -49,6 +51,12 @@ class ThlCatCreator(ThlBase):
 
     def getfilename(self):
         return "{}-{}-cat.xml".format(self.catsig, self.edsig)
+
+    def getvol(self, vnum):
+        for vol in self.vols:
+            if vol.getnum == int(vnum):
+                return vol
+        return None
 
     def load_data(self, datatype="cat", otherdatapath=None):
         if datatype == "cat":
@@ -88,10 +96,51 @@ class ThlCatCreator(ThlBase):
             vol.finalize()
             self.root.append(vol.root)
 
-    def write_cat(self, outfile):
-        # write out the root document, the full XML catalog
-        with open(outfile, 'w') as outf:
-            outf.write(self.printme())
+    def build_dox_cat(self):
+        # build a toc based on doxographical info from volumes
+        tsadox = ThlDox("rtsa ba'i chos sde", self.catsig, self.edsig, '1', 'rtsa')
+        gyabdox = ThlDox("rgyab chos bstan bcos", self.catsig, self.edsig, '1', 'rgyab')
+        for row in self.voldata:
+            dox = row[5].strip()
+            volnum = row[0].strip()
+
+            if int(volnum) < 42:
+                if dox not in tsadox.doxcats:
+                    tsadox.doxcats[dox] = [volnum]
+                else:
+                    tsadox.doxcats[dox].append(volnum)
+            elif dox not in gyabdox.doxcats:
+                    gyabdox.doxcats[dox] = [volnum]
+            else:
+                gyabdox.doxcats[dox].append(volnum)
+
+        tsadox.finalize()
+        ct = 0
+        for dox, vnums in tsadox.doxcats.items():
+            ct += 1
+            doxcat = ThlDox(dox, self.catsig, self.edsig, '2', ct, 'tib')
+            for vn in vnums:
+                doxcat.vols.append(self.getvol(vn))
+            doxcat.finalize()
+            tsadox.root.append(doxcat.root)
+        self.root.append(tsadox.root)
+
+        gyabdox.finalize()
+        ct = 0
+        for dox, vnums in gyabdox.doxcats.items():
+            ct += 1
+            doxcat = ThlDox(dox, self.catsig, self.edsig, '2', ct, 'tib')
+            for vn in vnums:
+                doxcat.vols.append(self.getvol(vn))
+            doxcat.finalize()
+            gyabdox.root.append(doxcat.root)
+        self.root.append(gyabdox.root)
+
+
+    # def write_cat(self, outfile):
+    #     # write out the root document, the full XML catalog
+    #     with open(outfile, 'w') as outf:
+    #         outf.write(self.printme())
 
 
     def write_volsum(self, outfile):
@@ -164,16 +213,20 @@ class ThlCatCreator(ThlBase):
 
 if __name__ == '__main__':
     # Create cat object by loading csv and assigning variables
-    datafile = '../data/km-t-data-naomi.csv'
-    write_the_cat = True
+    datafile = '../data/km-t-vol1-2.csv'
+    write_the_cat = False  # Whether to write the catalog ...-cat.xml file
 
     # Create the catalog objects
     mycat = ThlCatCreator(datafile, 'km', 't',
                           'Naomi Worth', '2017-03-22',
-                          "Tse ring rgya mtsho", "tse ring rgya mtsho")
+                          "Tse ring rgya mtsho", "tse ring rgya mtsho ")
     # Load extra vol data
     mycat.load_data('vol', '../data/km-vol-data-naomi.csv')
     mycat.load_data('voloffset', '../data/km-vol-offset.csv')
 
     # print out the files
-    mycat.write_cat_files('../out/', 'volbibs', 'textbibs', write_the_cat)
+    # mycat.write_cat_files('../out/', 'volbibs', 'textbibs', write_the_cat)
+
+    mycat.build_dox_cat()
+    mycat.writeme('../out/km-t-dox-toc.xml')
+

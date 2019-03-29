@@ -1,0 +1,17 @@
+<div id="coll-ed-dox" n="0" type="dox">
+    <bibl n="dox">
+        <title type="main">
+            <title lang="tib"></title>
+            <title lang="tib" rend="wyl"></title>
+            <title lang="eng"></title>
+        </title>
+        <extent class="volumes">
+            <num n="start"></num>
+            <num n="end"></num>
+        </extent>
+        <extent class="texts">
+            <num n="start"></num>
+            <num n="end"></num>
+        </extent>
+    </bibl>
+</div>

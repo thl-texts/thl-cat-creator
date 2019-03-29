@@ -71,7 +71,7 @@ class ThlText(ThlBase):
         pg, ln = self.page_split(self.stpg)
         tbib.settxt('/tibbibl/physdecl/pagination/rs[@n="start"]/num[@type="page"]', pg)
         tbib.settxt('/tibbibl/physdecl/pagination/rs[@n="start"]/num[@type="line"]', ln)
-        pg, ln = self.page_split(self.stpg)
+        pg, ln = self.page_split(self.enpg)
         tbib.settxt('/tibbibl/physdecl/pagination/rs[@n="end"]/num[@type="page"]', pg)
         tbib.settxt('/tibbibl/physdecl/pagination/rs[@n="end"]/num[@type="line"]', ln)
         tbib.settxt('/tibbibl/physdecl/extentdecl[@type="sides"]/extent[@class="total"]', self.pgs)

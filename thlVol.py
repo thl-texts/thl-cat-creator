@@ -37,10 +37,18 @@ class ThlVol(ThlBase):
         self.title = title
 
     def setnum(self, num=None):
-        if num is None:
-            num = int(self.vnum)
+        if num is not None:
+            self.vnum = num
         vnel = self.findel('/div/bibl/num[@type="volume"]')
-        vnel.text = str(num)
+        vnel.text = str(self.vnum)
+
+    def getnum(self):
+        vnum = None
+        try:
+            vnum = int(self.vnum)
+        except (TypeError, ValueError) as e:
+            pass
+        return vnum
 
     def add_text(self, atext):
         self.texts.append(atext)
