@@ -4,6 +4,17 @@ The ThlCatCreator class is the main class of the package. It is the controller o
 The __MAIN__ function here is the code that initiates and does the creation of all docs
 Calling on and using the other classes.
 
+The process involves:
+
+1.  initializing the ThlCatCreator with the path to the csv data, the sigla for the collection, the sigla for the edition
+    and optionally the cataloger’s name, the date cataloged, the edition’s name (in Tibetan), and the edition’s name
+    in Wylie.
+2.  loading in the volume data: two spreadsheets, one for the volume data, and one for the page offset, that is, the
+    number of pages before the beginning of the first text in the volume
+3.  calling the mycat.write_cat_files() function with path to the "out" folder, the name of the folder in the out folder
+    where you want the vol bibls, the name of the folder for the text bibls, and a boolean for whether to write the main
+    catalog file, such as km-t-cat.xml. If this is true, the file is created; if false, only the bibls are created.
+
 This class itself holds the main universal information about the catalog, including who cataloged it and when, the edition
 name that is currently being created, the wylie name for the edition, etc.
 
